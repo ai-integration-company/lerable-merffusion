@@ -6,6 +6,9 @@ from transformers import AutoModelForCausalLM
 from transformers import AutoProcessor
 from diffusers import DiffusionPipeline
 from transparent_background import Remover
+from diffusers import StableDiffusionInpaintPipeline
+import numpy as np
+import cv2
 
 
 def resize_with_padding(img, expected_size):
@@ -72,7 +75,9 @@ def resize_image(input_image, target_width=None, target_height=None):
 
 model_id = "microsoft/Phi-3-vision-128k-instruct"
 
-model = AutoModelForCausalLM.from_pretrained(model_id, device_map="cuda", trust_remote_code=True, torch_dtype="auto", _attn_implementation='eager')  # use _attn_implementation='eager' to disable flash attention
+# use _attn_implementation='eager' to disable flash attention
+model = AutoModelForCausalLM.from_pretrained(
+    model_id, device_map="cuda", trust_remote_code=True, torch_dtype="auto", _attn_implementation='eager')
 
 processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
 examples = [
@@ -179,9 +184,9 @@ examples = [
 ]
 # Answer in the following format: subject, location
 messages = [
-    {
-        "role": "user",
-        "content": f"""<|image_1|>\nPlease analyze the following image and provide specific details about the subject, its usual location, state and its size. 
+    {"role": "user",
+     "content":
+     f"""<|image_1|>\nPlease analyze the following image and provide specific details about the subject, its usual location, state and its size. 
         Follow these strict rules:
             1. Identify the subject in the image and its usual location.
             2. Determine subject's usual state: standing (on the ground) or hanging (from the ceiling).
@@ -196,9 +201,7 @@ messages = [
             "size": "large/small"
         }}
         Examples: {examples}
-        """
-    }
-]
+        """}]
 
 image = Image.open("lamp.jpg")
 
@@ -241,6 +244,18 @@ generator = torch.Generator(device="cuda").manual_seed(seed)
 
 negative_prompt = None
 cond_scale = 0.15
+
+pipe = StableDiffusionInpaintPipeline.from_pretrained(
+    "runwayml/stable-diffusion-inpainting",
+    revision="fp16",
+    torch_dtype=torch.float16,
+).to("cuda")
+
+mask_np = np.array(fg_mask)
+kernel = np.ones((20, 20), np.uint8)  # You can adjust the size of the kernel for more or less dilation
+mask_dilated = cv2.dilate(mask_np, kernel, iterations=1)
+mask_dilated = Image.fromarray(mask_dilated)
+
 with torch.autocast("cuda"):
     result = pipeline(
         prompt=response["prompt"],
@@ -255,4 +270,31 @@ with torch.autocast("cuda"):
         controlnet_conditioning_scale=cond_scale,
     ).images[0]
 
-result.save(f"output/{time.time_ns()}.jpg")
+    result2 = pipe(
+        prompt="background",
+        image=result,
+        mask_image=fg_mask,
+        num_images_per_prompt=1,
+        generator=generator,
+        num_inference_steps=20,
+    ).images[0]
+
+img = img.convert("RGBA")
+fg_mask = fg_mask.convert("L")
+
+img_np = np.array(img)
+mask_np = np.array(fg_mask)
+
+_, mask_binary = cv2.threshold(mask_np, 127, 255, cv2.THRESH_BINARY)
+
+b, g, r, a = cv2.split(img_np)
+
+alpha_channel = mask_binary
+
+rgba = cv2.merge((b, g, r, alpha_channel))
+
+result_img_pil = Image.fromarray(rgba, 'RGBA')
+
+bbox = fg_mask.getbbox()
+
+cropped_img_with_mask = result_img_pil.crop(bbox)

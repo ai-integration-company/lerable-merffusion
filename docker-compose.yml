@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+
+  ml:
+    build: ./src/ml
+    container_name: ml
+    ports:
+      - 3000:3000
+    networks:
+      - ai-product-lerua-network
+
+networks:
+  ai-product-lerua-network:
+    driver: bridge
