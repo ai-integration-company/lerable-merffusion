@@ -71,7 +71,7 @@ def encode_image_to_base64(image):
 model_id = "microsoft/Phi-3-vision-128k-instruct"
 
 model = AutoModelForCausalLM.from_pretrained(
-    model_id, device_map="cuda", trust_remote_code=True, torch_dtype="auto", _attn_implementation='eager')
+    model_id, device_map="cuda", trust_remote_code=True, torch_dtype=torch.float16, _attn_implementation='eager')
 processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
 
 examples = [
@@ -205,7 +205,7 @@ pipe = StableDiffusionInpaintPipeline.from_pretrained(
 ).to("cuda")
 
 model_id = "yahoo-inc/photo-background-generation"
-pipeline = DiffusionPipeline.from_pretrained(model_id, custom_pipeline=model_id).to("cuda")
+pipeline = DiffusionPipeline.from_pretrained(model_id, custom_pipeline=model_id, torch_dtype=torch.float16).to("cuda")
 
 seed = 42
 generator = torch.Generator(device="cuda").manual_seed(seed)
