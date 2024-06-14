@@ -1,18 +1,14 @@
+FROM python:3.10-slim
 
-FROM ubuntu:jammy
+WORKDIR /ml
 
-RUN mkdir /app
-RUN apt update && apt upgrade -y
+COPY . .
 
 RUN apt-get update && apt-get install libgl1 -y  libglib2.0-0 libsm6 libxrender1 libxext6
 
-RUN apt install -y python3 python3-pip curl netcat dos2unix
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN dos2unix /app/run.sh
+EXPOSE 3000
 
-ADD requirements.txt run.sh main.py /app
 
-RUN python3 -m pip install -r /app/requirements.txt
-
-CMD PYTHONPATH=/app /app/run.sh
-
+CMD ["uvicorn", "server:app", "--reload", "--host", "0.0.0.0", "--port", "3000"]
