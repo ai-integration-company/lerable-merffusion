@@ -286,7 +286,7 @@ def process_image_endpoint(input: ImageInput):
     rgba = cv2.merge((b, g, r, alpha_channel))
     result_img_pil = Image.fromarray(rgba, 'RGBA')
 
-    bbox = fg_mask.getbbox()
+    bbox = result_img_pil.getbbox()
     cropped_img_with_mask = result_img_pil.crop(bbox)
 
     background_b64 = encode_image_to_base64(result2)
