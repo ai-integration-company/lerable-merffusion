@@ -19,9 +19,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:5173", 
+    " https://labre-tau.vercel.app/"  
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -231,6 +236,11 @@ generator = torch.Generator(device="cuda").manual_seed(seed)
 def process_image_endpoint(input: ImageInput):
 
     image = decode_base64_to_image(input.image)
+    if image.mode == 'RGBA':
+        background = Image.new('RGB', image.size, (255, 255, 255))
+        
+        rgb_image = Image.alpha_composite(background.convert('RGBA'), image).convert('RGB')
+        image = rgb_image
 
     inputs = processor(prompt, [image], return_tensors="pt").to("cuda")
     generation_args = {
