@@ -1,0 +1,12 @@
+{
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "javascript.memoryLimit": 6192,
+    "editor.folding": false,
+    "typescript.tsserver.maxTsServerIdleTime": 600000,
+    "typescript.tsserver.log": "verbose",
+    "eslint.workingDirectories": ["src"]
+}
