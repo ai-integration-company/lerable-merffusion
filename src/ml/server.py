@@ -89,7 +89,7 @@ examples = [
 
 messages = [
     {"role": "user",
-        "content": f"""\nPlease analyze the following image and provide specific details about the subject, its usual location, state and its size. 
+        "content": f"""<|image_1|>\nPlease analyze the following image and provide specific details about the subject, its usual location, state and its size. 
         Follow these strict rules:
             1. Identify the subject in the image and its usual location.
             2. Determine subject's usual state: standing (on the ground) or hanging (from the ceiling).
