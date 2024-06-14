@@ -13,16 +13,27 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from io import BytesIO
 from prometheus_fastapi_instrumentator import Instrumentator
+from fastapi.middleware.cors import CORSMiddleware
 
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 Instrumentator().instrument(app).expose(app)
 
 
 class ImageInput(BaseModel):
     image: str
+    positive_prompt: str
+    negative_prompt: str
 
 
 class ImageOutput(BaseModel):
@@ -264,9 +275,9 @@ def process_image_endpoint(input: ImageInput):
         ).images[0]
 
         result2 = pipe(
-            prompt="only background",
+            prompt=input.positive_prompt,
             image=result,
-            negative_prompt="new objects or entities",
+            negative_prompt=input.negative_prompt,
             mask_image=mask_dilated,
             num_images_per_prompt=1,
             generator=generator,
@@ -286,7 +297,7 @@ def process_image_endpoint(input: ImageInput):
     rgba = cv2.merge((b, g, r, alpha_channel))
     result_img_pil = Image.fromarray(rgba, 'RGBA')
 
-    bbox = fg_mask.getbbox()
+    bbox = result_img_pil.getbbox()
     cropped_img_with_mask = result_img_pil.crop(bbox)
 
     background_b64 = encode_image_to_base64(result2)
