@@ -4,6 +4,8 @@ WORKDIR /ml
 
 COPY . .
 
+RUN apt-get update && apt-get install libgl1 -y  libglib2.0-0 libsm6 libxrender1 libxext6
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 3000
