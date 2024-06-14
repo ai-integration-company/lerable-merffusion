@@ -84,6 +84,96 @@ examples = [
         "prompt": "a chandelier in the dining room",
         "placement": "hanging",
         "size": "large"
+    },
+    {
+        "prompt": "a sofa in the living room",
+        "placement": "standing",
+        "size": "large"
+    },
+    {
+        "prompt": "a ceiling fan in the bedroom",
+        "placement": "hanging",
+        "size": "large"
+    },
+    {
+        "prompt": "a bookshelf in the bedroom",
+        "placement": "standing",
+        "size": "large"
+    },
+    {
+        "prompt": "a coffee table in the kitchen",
+        "placement": "standing",
+        "size": "small"
+    },
+    {
+        "prompt": "a pendant light in the kitchen",
+        "placement": "hanging",
+        "size": "small"
+    },
+    {
+        "prompt": "a floor lamp in the hall",
+        "placement": "standing",
+        "size": "small"
+    },
+    {
+        "prompt": "a dining table in the kitchen",
+        "placement": "standing",
+        "size": "large"
+    },
+    {
+        "prompt": "a bed in the bedroom",
+        "placement": "standing",
+        "size": "large"
+    },
+    {
+        "prompt": "a ceiling-mounted smoke detector in the hall",
+        "placement": "hanging",
+        "size": "small"
+    },
+    {
+        "prompt": "a kitchen island in the kitchen",
+        "placement": "standing",
+        "size": "large"
+    },
+    {
+        "prompt": "a bathtub in the bathroom",
+        "placement": "standing",
+        "size": "large"
+    },
+    {
+        "prompt": "a hanging plant in the living room",
+        "placement": "hanging",
+        "size": "small"
+    },
+    {
+        "prompt": "a refrigerator in the kitchen",
+        "placement": "standing",
+        "size": "large"
+    },
+    {
+        "prompt": "a microwave on the countertop",
+        "placement": "standing",
+        "size": "small"
+    },
+    {
+        "prompt": "a ceiling light in the hallway",
+        "placement": "hanging",
+        "size": "small"
+    },
+    {
+        "prompt": "a floor cushion in the playroom",
+        "placement": "standing",
+        "size": "small"
+    },
+    {
+        "prompt": "an overhead projector in the classroom",
+        "placement": "hanging",
+        "size": "large"
+    },
+    {
+        "prompt": "a rug on the floor",
+        "placement": "standing",
+        "size": "large"
     }
 ]
 
