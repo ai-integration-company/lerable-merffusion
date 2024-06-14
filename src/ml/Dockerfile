@@ -6,7 +6,7 @@ RUN apt update && apt upgrade -y
 
 RUN apt-get update && apt-get install libgl1 -y  libglib2.0-0 libsm6 libxrender1 libxext6
 
-RUN apt install -y python3 python3-pip curl netcat
+RUN apt install -y python3 python3-pip curl netcat dos2unix
 
 RUN dos2unix /app/run.sh
 
