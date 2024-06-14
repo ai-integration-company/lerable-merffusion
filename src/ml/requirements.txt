@@ -9,3 +9,4 @@ transparent-background
 opencv-python-headless
 transparent_background
 accelerate
+prometheus-fastapi-instrumentator

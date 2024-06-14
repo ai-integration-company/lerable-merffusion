@@ -25,23 +25,18 @@ def resize_with_padding(img, expected_size):
 
 def process_image(input_image, is_small, is_standing):
 
-    # Create a 512x512 white canvas
     canvas_size = (512, 512)
     canvas = Image.new("RGB", canvas_size, "white")
 
     if is_standing:
-        # Paste the image around 1/3 height from the top of the canvas
         center_height = 2 * canvas_size[1] // 3
     else:
-        # Paste the image around 2/3 height from the top of the canvas
         center_height = canvas_size[1] // 3
 
     paste_height = center_height - (input_image.height // 2)
-    # Calculate the horizontal position (centered)
     paste_width = (canvas_size[0] - input_image.width) // 2
 
     try:
-        # Paste the input image onto the canvas
         canvas.paste(input_image, (paste_width, paste_height))
     except:
         canvas = input_image.resize(512, 512)
@@ -51,18 +46,14 @@ def process_image(input_image, is_small, is_standing):
 
 def resize_image(input_image, target_width=None, target_height=None):
 
-    # Get the original dimensions
     original_width, original_height = input_image.size
 
-    # Calculate the new dimensions maintaining the aspect ratio
     if target_width and target_height:
         raise ValueError("Specify only one of target_width or target_height, not both.")
     elif target_width:
-        # Calculate the new height maintaining the aspect ratio
         new_width = target_width
         new_height = int((new_width / original_width) * original_height)
     elif target_height:
-        # Calculate the new width maintaining the aspect ratio
         new_height = target_height
         new_width = int((new_height / original_height) * original_width)
     else:
@@ -75,7 +66,6 @@ def resize_image(input_image, target_width=None, target_height=None):
 
 model_id = "microsoft/Phi-3-vision-128k-instruct"
 
-# use _attn_implementation='eager' to disable flash attention
 model = AutoModelForCausalLM.from_pretrained(
     model_id, device_map="cuda", trust_remote_code=True, torch_dtype="auto", _attn_implementation='eager')
 
@@ -182,7 +172,7 @@ examples = [
         "size": "large"
     }
 ]
-# Answer in the following format: subject, location
+
 messages = [
     {"role": "user",
      "content":
@@ -217,7 +207,6 @@ generation_args = {
 
 generate_ids = model.generate(**inputs, eos_token_id=processor.tokenizer.eos_token_id, **generation_args)
 
-# remove input tokens
 generate_ids = generate_ids[:, inputs['input_ids'].shape[1]:]
 response = processor.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
 response = json.loads(response)
@@ -252,7 +241,7 @@ pipe = StableDiffusionInpaintPipeline.from_pretrained(
 ).to("cuda")
 
 mask_np = np.array(fg_mask)
-kernel = np.ones((20, 20), np.uint8)  # You can adjust the size of the kernel for more or less dilation
+kernel = np.ones((30, 30), np.uint8) 
 mask_dilated = cv2.dilate(mask_np, kernel, iterations=1)
 mask_dilated = Image.fromarray(mask_dilated)
 
@@ -271,8 +260,9 @@ with torch.autocast("cuda"):
     ).images[0]
 
     result2 = pipe(
-        prompt="background",
+        prompt="only background",
         image=result,
+        negative_prompt="new object or entity",
         mask_image=fg_mask,
         num_images_per_prompt=1,
         generator=generator,

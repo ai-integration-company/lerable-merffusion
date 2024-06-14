@@ -12,8 +12,13 @@ import cv2
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from io import BytesIO
+from prometheus_fastapi_instrumentator import Instrumentator
+
+
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app)
 
 
 class ImageInput(BaseModel):
@@ -240,7 +245,7 @@ def process_image_endpoint(input: ImageInput):
     cond_scale = 0.15
 
     mask_np = np.array(fg_mask)
-    kernel = np.ones((20, 20), np.uint8)
+    kernel = np.ones((30, 30), np.uint8)
     mask_dilated = cv2.dilate(mask_np, kernel, iterations=1)
     mask_dilated = Image.fromarray(mask_dilated)
 
@@ -259,8 +264,9 @@ def process_image_endpoint(input: ImageInput):
         ).images[0]
 
         result2 = pipe(
-            prompt="background",
+            prompt="only background",
             image=result,
+            negative_prompt="new objects or entities",
             mask_image=mask_dilated,
             num_images_per_prompt=1,
             generator=generator,
@@ -292,3 +298,11 @@ def process_image_endpoint(input: ImageInput):
         x=bbox[0],
         y=bbox[1],
     )
+
+
+
+@app.get("/health-check")
+def healthcheck():
+    return {
+        'status': 'OK'
+    }
