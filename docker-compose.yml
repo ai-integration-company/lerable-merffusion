@@ -1,13 +1,20 @@
 version: "3.8"
-services:
 
+services:
   ml:
     build: ./src/ml
     container_name: ml
     ports:
-      - 3000:3000
+      - "3000:3000"
     networks:
       - ai-product-lerua-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
 
 networks:
   ai-product-lerua-network:
