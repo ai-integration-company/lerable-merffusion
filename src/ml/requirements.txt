@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+Pillow
+torch
+transformers
+diffusers
+transparent-background
+opencv-python-headless
+transparent_background
+accelerate
