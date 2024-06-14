@@ -1,6 +1,11 @@
-FROM python:3.10-slim
+FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu20.04
 
 WORKDIR /ml
+
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip git wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY . .
 
