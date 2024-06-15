@@ -39,6 +39,8 @@ class ImageInput(BaseModel):
     image: str
     positive_prompt: str
     negative_prompt: str
+    kernel_size: int
+    use_kernel: int
 
 
 class ImageOutput(BaseModel):
@@ -266,9 +268,13 @@ def process_image_endpoint(input: ImageInput):
     cond_scale = 0.15
 
     mask_np = np.array(fg_mask)
-    kernel = np.ones((30, 30), np.uint8)
+    kernel = np.ones((input.kernel_size, input.kernel_size), np.uint8)
     mask_dilated = cv2.dilate(mask_np, kernel, iterations=1)
     mask_dilated = Image.fromarray(mask_dilated)
+
+    if input.use_kernel == 0:
+        mask_dilated = fg_mask.copy()
+        mask_dilated.paste((255, 255, 255), mask_dilated.getbbox())
 
     with torch.autocast("cuda"):
         result = pipeline(
