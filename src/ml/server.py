@@ -13,7 +13,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from io import BytesIO
 from prometheus_fastapi_instrumentator import Instrumentator
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 
 
 
@@ -21,7 +21,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173", 
-    " https://labre-tau.vercel.app/"  
+    "https://labre-tau.vercel.app/"  
 ]
 
 app.add_middleware(
@@ -41,7 +41,8 @@ class ImageInput(BaseModel):
     negative_prompt: str
     kernel_size: int
     use_kernel: int
-
+    inpaint_additional_prompt: str
+    inpaint_negative: str
 
 class ImageOutput(BaseModel):
     background: str
@@ -278,8 +279,8 @@ def process_image_endpoint(input: ImageInput):
 
     with torch.autocast("cuda"):
         result = pipeline(
-            prompt=response["prompt"],
-            negative_prompt=negative_prompt,
+            prompt=response["prompt"]+input.inpaint_additional_prompt,
+            negative_prompt=input.inpaint_negative,
             image=img,
             mask_image=mask,
             control_image=mask,
