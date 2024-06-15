@@ -1,6 +1,6 @@
 # lerrable–merfusion 
 
-Ссылка на развёрнутую версию: https://labre-tau.vercel.app/
+Ссылка на развёрнутую версию: https://lobster-app-t4dmm.ondigitalocean.app/
 
 В случае, если фронтенд по ссылке выше не работает, протестируйте пайплайн из ноутбука tests_lm.ipyb
 ## Описание
