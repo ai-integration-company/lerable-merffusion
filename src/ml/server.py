@@ -47,6 +47,7 @@ class ImageInput(BaseModel):
 class ImageOutput(BaseModel):
     background: str
     product: str
+    generated_image: str
     x: int
     y: int
 
@@ -319,10 +320,12 @@ def process_image_endpoint(input: ImageInput):
 
     background_b64 = encode_image_to_base64(result2)
     object_b64 = encode_image_to_base64(cropped_img_with_mask)
+    gen_im = encode_image_to_base64(result)
 
     return ImageOutput(
         background=background_b64,
         product=object_b64,
+        generated_image=gen_im,
         x=bbox[0],
         y=bbox[1],
     )
